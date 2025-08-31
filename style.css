@@ -159,6 +159,14 @@ body {
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+}
+
 .auth-input {
     width: 100%;
     padding: 16px;
@@ -692,6 +700,113 @@ body {
     font-size: 0.8rem;
 }
 
+/* Активы */
+.assets-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.wallet-card {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+}
+
+.wallet-balance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.total-balance {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent-green);
+}
+
+.profit {
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 20px;
+}
+
+.assets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.asset-item {
+    background: var(--bg-primary);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.deposit-section {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.deposit-btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 15px 30px;
+    background: var(--accent-blue);
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.deposit-btn:hover {
+    background: #1d4ed8;
+}
+
+.transaction-history {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+}
+
+.transactions-list {
+    margin-top: 20px;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.transaction-item .amount {
+    font-weight: 600;
+}
+
+.transaction-item .date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
 /* Модальное окно */
 .modal {
     display: none;
@@ -758,6 +873,108 @@ body {
     font-size: 1.1rem;
 }
 
+/* Нижняя навигация */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.nav-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    padding: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.nav-btn.active {
+    color: var(--accent-blue);
+}
+
+.nav-btn span {
+    display: block;
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+}
+
+/* Сообщения об ошибках и уведомления */
+.error-message {
+    color: var(--accent-red);
+    font-size: 0.9rem;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.success-message {
+    color: var(--accent-green);
+    font-size: 0.9rem;
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(22, 163, 74, 0.1);
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    animation: slideInRight 0.3s ease-out;
+    max-width: 300px;
+}
+
+.notification.success {
+    background: var(--accent-green);
+    box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.notification.error {
+    background: var(--accent-red);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
 /* Адаптивность */
 @media (max-width: 768px) {
     .terminal-content {
@@ -781,6 +998,16 @@ body {
     
     .quick-actions {
         grid-template-columns: 1fr;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .user-info {
+        flex-direction: column;
+        gap: 8px;
     }
 }
 
@@ -813,4 +1040,30 @@ body {
 
 .modal-content {
     animation: slideIn 0.3s ease-out;
+}
+
+/* Утилиты */
+.hidden {
+    display: none !important;
+}
+
+.visible {
+    display: block !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-10 {
+    margin-top: 10px;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
