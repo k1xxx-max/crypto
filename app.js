@@ -1,20 +1,18 @@
 // Конфигурация
 const CRYPTOS = [
-    { symbol: 'BTCUSDT', name: 'Bitcoin', icon: '₿' },
-    { symbol: 'ETHUSDT', name: 'Ethereum', icon: 'Ξ' },
-    { symbol: 'USDTUSDT', name: 'Tether', icon: '₮' },
-    { symbol: 'SOLUSDT', name: 'Solana', icon: '◎' },
-    { symbol: 'XRPUSDT', name: 'XRP', icon: '✕' },
-    { symbol: 'USDCUSDT', name: 'USD Coin', icon: '₡' },
-    { symbol: 'ADAUSDT', name: 'Cardano', icon: 'Α' },
-    { symbol: 'DOGEUSDT', name: 'Dogecoin', icon: 'Ð' },
-    { symbol: 'AVAXUSDT', name: 'Avalanche', icon: '⏣' }
+    { symbol: 'BTCUSDT', name: 'Bitcoin', price: 42150.30, change: 2.45 },
+    { symbol: 'ETHUSDT', name: 'Ethereum', price: 2250.80, change: 1.23 },
+    { symbol: 'SOLUSDT', name: 'Solana', price: 95.60, change: 5.67 },
+    { symbol: 'XRPUSDT', name: 'XRP', price: 0.58, change: -0.45 },
+    { symbol: 'ADAUSDT', name: 'Cardano', price: 0.48, change: 0.89 },
+    { symbol: 'DOGEUSDT', name: 'Dogecoin', price: 0.082, change: -1.23 },
+    { symbol: 'AVAXUSDT', name: 'Avalanche', price: 34.20, change: 3.45 }
 ];
 
 let currentUser = null;
-let currentCrypto = null;
+let currentSymbol = 'BTCUSDT';
 let chartWidget = null;
-let currentInterval = '15';
+let currentOrder = null;
 
 // Инициализация приложения
 document.addEventListener('DOMContentLoaded', function() {
@@ -23,91 +21,231 @@ document.addEventListener('DOMContentLoaded', function() {
     
     checkAuth();
     initAuthTabs();
-    renderCryptoList();
-    initChartToolbar();
+    initTradingView();
+    initEventListeners();
+    startPriceUpdates();
 });
 
-// ... (функции checkAuth, initAuthTabs, register, login, logout остаются такими же) ...
+// Проверка авторизации
+function checkAuth() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+        currentUser = JSON.parse(savedUser);
+        showAuthedUI();
+        updateMarketTickers();
+    }
+}
 
-// Инициализация тулбара графика
-function initChartToolbar() {
-    const toolbarButtons = document.querySelectorAll('.toolbar-btn');
-    toolbarButtons.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Убираем активный класс у всех кнопок
-            toolbarButtons.forEach(b => b.classList.remove('active'));
-            // Добавляем активный класс текущей кнопке
-            this.classList.add('active');
+// Инициализация табов авторизации
+function initAuthTabs() {
+    const tabs = document.querySelectorAll('.auth-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
             
-            // Обновляем интервал графика
-            currentInterval = this.getAttribute('data-interval');
-            if (chartWidget && currentCrypto) {
-                updateChartInterval(currentInterval);
-            }
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            
+            tab.classList.add('active');
+            document.getElementById(`${tabName}-form`).classList.add('active');
         });
     });
 }
 
-// Обновление интервала графика
-function updateChartInterval(interval) {
-    if (chartWidget) {
-        chartWidget.chart().setResolution(interval);
+// Инициализация TradingView
+function initTradingView() {
+    if (typeof TradingView === 'undefined') {
+        setTimeout(initTradingView, 100);
+        return;
+    }
+    
+    // График будет инициализирован при открытии торговой страницы
+}
+
+// Инициализация слушателей событий
+function initEventListeners() {
+    // Слушатели для торговых кнопок
+    document.querySelectorAll('.timeframe-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            updateChartResolution(this.textContent);
+        });
+    });
+    
+    // Слушатели для индикаторов
+    document.querySelectorAll('.indicator-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            toggleIndicator(this.textContent);
+        });
+    });
+    
+    // Слушатели для слайдеров плеча
+    document.querySelectorAll('.leverage-slider').forEach(slider => {
+        slider.addEventListener('input', function() {
+            const value = this.value;
+            this.parentElement.querySelector('span').textContent = `${value}x`;
+            updateOrderSummary();
+        });
+    });
+    
+    // Слушатели для Input полей
+    document.querySelectorAll('.order-input').forEach(input => {
+        input.addEventListener('input', updateOrderSummary);
+    });
+}
+
+// Регистрация
+function register() {
+    const username = document.getElementById('regUsername').value;
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+    if (!username || !password) {
+        showError('Заполните все поля');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        showError('Пароли не совпадают');
+        return;
+    }
+
+    const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    if (existingUsers.find(user => user.username === username)) {
+        showError('Пользователь с таким логином уже существует');
+        return;
+    }
+
+    const newUser = {
+        username,
+        password,
+        balance: 10000,
+        positions: [],
+        orders: [],
+        createdAt: new Date().toISOString()
+    };
+
+    existingUsers.push(newUser);
+    localStorage.setItem('users', JSON.stringify(existingUsers));
+    
+    currentUser = newUser;
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    showAuthedUI();
+    showSuccess('Регистрация успешна!');
+}
+
+// Вход
+function login() {
+    const username = document.getElementById('loginUsername').value;
+    const password = document.getElementById('loginPassword').value;
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (user) {
+        currentUser = user;
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        showAuthedUI();
+        showSuccess('Вход выполнен успешно!');
+    } else {
+        showError('Неверный логин или пароль');
     }
 }
 
-// Открытие графика
-function openChart(crypto) {
-    currentCrypto = crypto;
+// Выход
+function logout() {
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    showAuthUI();
+    showSuccess('Выход выполнен');
+}
+
+// Показать UI для авторизованного пользователя
+function showAuthedUI() {
+    document.getElementById('auth-page').classList.remove('active');
+    document.getElementById('main-page').classList.add('active');
+    document.getElementById('bottomNav').style.display = 'flex';
+    document.getElementById('userInfo').style.display = 'flex';
+    document.getElementById('usernameDisplay').textContent = currentUser.username;
     
-    // Обновляем информацию о крипте
-    document.getElementById('selectedCryptoName').textContent = crypto.name;
-    document.getElementById('selectedCryptoSymbol').textContent = crypto.symbol;
+    updateUserBalance();
+}
+
+// Показать UI для неавторизованного пользователя
+function showAuthUI() {
+    document.getElementById('auth-page').classList.add('active');
+    document.getElementById('main-page').classList.remove('active');
+    document.getElementById('bottomNav').style.display = 'none';
+    document.getElementById('userInfo').style.display = 'none';
+}
+
+// Переключение страниц
+function switchPage(pageName) {
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
-    // Генерируем случайные данные для демонстрации
-    const randomPrice = (Math.random() * 100000).toFixed(2);
-    const randomChange = (Math.random() - 0.5) * 10;
-    const isPositive = randomChange >= 0;
+    document.getElementById(`${pageName}-page`).classList.add('active');
+    document.querySelector(`.nav-btn[data-page="${pageName}"]`).classList.add('active');
     
-    document.getElementById('currentPrice').textContent = `$${randomPrice}`;
-    document.getElementById('priceChange').textContent = `${isPositive ? '+' : ''}${randomChange.toFixed(2)}%`;
-    document.getElementById('priceChange').className = isPositive ? 'price-change positive' : 'price-change negative';
+    if (pageName === 'trade') {
+        initTradingViewChart();
+    }
+}
+
+// Обновление баланса пользователя
+function updateUserBalance() {
+    const balanceElement = document.querySelector('.balance-preview');
+    if (balanceElement && currentUser) {
+        balanceElement.textContent = `${currentUser.balance.toFixed(2)} USDT`;
+    }
+}
+
+// Обновление рыночных тикеров
+function updateMarketTickers() {
+    const container = document.querySelector('.market-tickers');
+    if (!container) return;
     
-    // Обновляем 24h статистику
-    document.getElementById('volume24h').textContent = `$${(Math.random() * 2 + 0.5).toFixed(1)}B`;
-    document.getElementById('high24h').textContent = `$${(randomPrice * 1.05).toFixed(2)}`;
-    document.getElementById('low24h').textContent = `$${(randomPrice * 0.95).toFixed(2)}`;
+    container.innerHTML = '';
     
-    // Показываем контейнер графика
-    document.getElementById('chartContainer').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    
-    // Инициализируем график TradingView с настройками для свечей
-    initTradingViewChart(crypto.symbol);
+    CRYPTOS.forEach(crypto => {
+        const isPositive = crypto.change >= 0;
+        const tickerElement = document.createElement('div');
+        tickerElement.className = 'ticker-item';
+        tickerElement.innerHTML = `
+            <div>
+                <strong>${crypto.symbol}</strong>
+                <div>$${crypto.price.toFixed(2)}</div>
+            </div>
+            <div class="${isPositive ? 'positive' : 'negative'}">
+                ${isPositive ? '+' : ''}${crypto.change.toFixed(2)}%
+            </div>
+        `;
+        container.appendChild(tickerElement);
+    });
 }
 
 // Инициализация графика TradingView
-function initTradingViewChart(symbol) {
+function initTradingViewChart() {
     if (chartWidget) {
         chartWidget.remove();
     }
     
     chartWidget = new TradingView.widget({
-        symbol: `BINANCE:${symbol}`,
-        interval: currentInterval,
+        symbol: `BINANCE:${currentSymbol}`,
+        interval: '15',
         container_id: 'tradingview-chart',
         theme: 'dark',
-        style: '1', // Стиль свечей
+        style: '1',
         locale: 'ru',
         toolbar_bg: '#1e293b',
         enable_publishing: false,
         hide_top_toolbar: false,
         hide_legend: true,
         save_image: false,
-        studies: [
-            'RSI@tv-basicstudies',
-            'MACD@tv-basicstudies',
-            'Volume@tv-basicstudies'
-        ],
+        studies: ['RSI@tv-basicstudies', 'MACD@tv-basicstudies', 'Volume@tv-basicstudies'],
         drawings_access: { 
             type: 'black', 
             tools: [ 
@@ -121,73 +259,227 @@ function initTradingViewChart(symbol) {
             'left_toolbar',
             'timeframes_toolbar',
             'edit_buttons_in_legend',
-            'context_menus',
-            'control_bar'
+            'context_menus'
         ],
-        enabled_features: [
-            'study_templates',
-            'move_logo_to_main_pane'
-        ],
+        enabled_features: ['study_templates'],
         overrides: {
-            // Настройки для свечного графика
-            "mainSeriesProperties.style": 1, // Свечи
+            "mainSeriesProperties.style": 1,
             "mainSeriesProperties.candleStyle.upColor": "#16a34a",
             "mainSeriesProperties.candleStyle.downColor": "#dc2626",
             "mainSeriesProperties.candleStyle.wickUpColor": "#16a34a",
             "mainSeriesProperties.candleStyle.wickDownColor": "#dc2626",
-            "mainSeriesProperties.candleStyle.borderUpColor": "#16a34a",
-            "mainSeriesProperties.candleStyle.borderDownColor": "#dc2626",
-            
             "paneProperties.background": "#0f172a",
             "paneProperties.vertGridProperties.color": "#334155",
-            "paneProperties.horzGridProperties.color": "#334155",
-            "paneProperties.crossHairProperties.color": "#94a3b8",
-            
-            "scalesProperties.textColor": "#94a3b8",
-            "scalesProperties.lineColor": "#334155"
-        },
-        loading_screen: {
-            backgroundColor: '#0f172a'
-        },
-        time_frames: [
-            { text: "1m", resolution: "1" },
-            { text: "5m", resolution: "5" },
-            { text: "15m", resolution: "15" },
-            { text: "30m", resolution: "30" },
-            { text: "1h", resolution: "60" },
-            { text: "4h", resolution: "240" },
-            { text: "1D", resolution: "1D" }
-        ]
-    });
-    
-    // Обработчик изменения интервала
-    chartWidget.onChartReady(() => {
-        chartWidget.chart().onIntervalChanged().subscribe(null, (interval) => {
-            currentInterval = interval;
-            updateToolbarButtons(interval);
-        });
-    });
-}
-
-// Обновление кнопок тулбара
-function updateToolbarButtons(interval) {
-    const buttons = document.querySelectorAll('.toolbar-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.getAttribute('data-interval') === interval) {
-            btn.classList.add('active');
+            "paneProperties.horzGridProperties.color": "#334155"
         }
     });
 }
 
-// Закрытие графика
-function closeChart() {
-    document.getElementById('chartContainer').style.display = 'none';
-    document.body.style.overflow = 'auto';
-    if (chartWidget) {
-        chartWidget.remove();
-        chartWidget = null;
+// Обновление разрешения графика
+function updateChartResolution(resolution) {
+    if (!chartWidget) return;
+    
+    const resolutionMap = {
+        '1m': '1',
+        '5m': '5',
+        '15m': '15',
+        '30m': '30',
+        '1h': '60',
+        '4h': '240',
+        '1D': '1D',
+        '1W': '1W'
+    };
+    
+    const interval = resolutionMap[resolution] || '15';
+    chartWidget.chart().setResolution(interval);
+}
+
+// Переключение индикатора
+function toggleIndicator(indicator) {
+    if (!chartWidget) return;
+    
+    const indicatorMap = {
+        'RSI': 'RSI@tv-basicstudies',
+        'MACD': 'MACD@tv-basicstudies',
+        'VOL': 'Volume@tv-basicstudies'
+    };
+    
+    const studyId = indicatorMap[indicator];
+    if (studyId) {
+        const chart = chartWidget.chart();
+        const studies = chart.getAllStudies();
+        const existingStudy = studies.find(s => s.name === studyId);
+        
+        if (existingStudy) {
+            chart.removeStudy(existingStudy.id);
+        } else {
+            chart.createStudy(studyId, false, false);
+        }
     }
 }
 
-// ... (остальные функции остаются такими же) ...
+// Смена символа
+function changeSymbol() {
+    const select = document.getElementById('symbolSelect');
+    currentSymbol = select.value;
+    
+    // Обновляем цену и изменение
+    const crypto = CRYPTOS.find(c => c.symbol === currentSymbol);
+    if (crypto) {
+        document.querySelector('.price').textContent = `$${crypto.price.toFixed(2)}`;
+        const changeElement = document.querySelector('.change');
+        changeElement.textContent = `${crypto.change >= 0 ? '+' : ''}${crypto.change.toFixed(2)}%`;
+        changeElement.className = crypto.change >= 0 ? 'change positive' : 'change negative';
+    }
+    
+    // Обновляем график
+    if (chartWidget) {
+        chartWidget.setSymbol(`BINANCE:${currentSymbol}`);
+    }
+}
+
+// Размещение ордера
+function placeOrder(side) {
+    const priceInput = document.querySelector(`.order-side.${side} .order-input[type="number"]`);
+    const amountInput = document.querySelectorAll(`.order-side.${side} .order-input[type="number"]`)[1];
+    const leverageInput = document.querySelector(`.order-side.${side} .leverage-slider`);
+    
+    const price = parseFloat(priceInput.value);
+    const amount = parseFloat(amountInput.value);
+    const leverage = parseInt(leverageInput.value);
+    
+    if (!price || !amount) {
+        showError('Заполните все поля');
+        return;
+    }
+    
+    currentOrder = {
+        symbol: currentSymbol,
+        side: side,
+        price: price,
+        amount: amount,
+        leverage: leverage,
+        total: price * amount,
+        margin: (price * amount) / leverage
+    };
+    
+    showOrderModal();
+}
+
+// Показать модальное окно ордера
+function showOrderModal() {
+    document.getElementById('modalTitle').textContent = 'Подтверждение ордера';
+    document.getElementById('confirmSymbol').textContent = currentOrder.symbol;
+    document.getElementById('confirmSide').textContent = currentOrder.side.toUpperCase();
+    document.getElementById('confirmPrice').textContent = `${currentOrder.price.toFixed(2)} USDT`;
+    document.getElementById('confirmAmount').textContent = `${currentOrder.amount} ${currentOrder.symbol.replace('USDT', '')}`;
+    document.getElementById('confirmLeverage').textContent = `${currentOrder.leverage}x`;
+    document.getElementById('confirmTotal').textContent = `${currentOrder.total.toFixed(2)} USDT`;
+    
+    document.getElementById('orderModal').style.display = 'block';
+}
+
+// Закрыть модальное окно
+function closeModal() {
+    document.getElementById('orderModal').style.display = 'none';
+    currentOrder = null;
+}
+
+// Подтверждение ордера
+function confirmOrder() {
+    if (!currentOrder || !currentUser) return;
+    
+    // Сохраняем ордер
+    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+    orders.push({
+        ...currentOrder,
+        id: Date.now(),
+        userId: currentUser.username,
+        status: 'open',
+        timestamp: new Date().toISOString()
+    });
+    localStorage.setItem('orders', JSON.stringify(orders));
+    
+    showSuccess(`Ордер ${currentOrder.side.toUpperCase()} размещен успешно!`);
+    closeModal();
+    
+    // Обновляем UI
+    updatePositions();
+    updateOrders();
+}
+
+// Обновление позиций
+function updatePositions() {
+    // Заглушка для обновления списка позиций
+}
+
+// Обновление ордеров
+function updateOrders() {
+    // Заглушка для обновления списка ордеров
+}
+
+// Обновление сводки ордера
+function updateOrderSummary() {
+    // Заглушка для расчета маржи и стоимости
+}
+
+// Обновление цен в реальном времени
+function startPriceUpdates() {
+    setInterval(() => {
+        CRYPTOS.forEach(crypto => {
+            // Имитация изменения цены
+            const change = (Math.random() - 0.5) * 2;
+            crypto.change += change;
+            crypto.price *= (1 + change / 100);
+            
+            // Обновляем UI если нужно
+            if (crypto.symbol === currentSymbol) {
+                document.querySelector('.price').textContent = `$${crypto.price.toFixed(2)}`;
+                const changeElement = document.querySelector('.change');
+                changeElement.textContent = `${crypto.change >= 0 ? '+' : ''}${crypto.change.toFixed(2)}%`;
+                changeElement.className = crypto.change >= 0 ? 'change positive' : 'change negative';
+            }
+        });
+        
+        updateMarketTickers();
+    }, 5000);
+}
+
+// Включение полноэкранного режима
+function toggleFullscreen() {
+    const terminal = document.querySelector('.trading-terminal');
+    if (!document.fullscreenElement) {
+        terminal.requestFullscreen().catch(err => {
+            showError('Ошибка полноэкранного режима');
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Показать уведомление об ошибке
+function showError(message) {
+    alert(`❌ ${message}`);
+}
+
+// Показать уведомление об успехе
+function showSuccess(message) {
+    alert(`✅ ${message}`);
+}
+
+// Глобальные обработчики
+window.onclick = function(event) {
+    const modal = document.getElementById('orderModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+
+window.onkeydown = function(event) {
+    if (event.key === 'Escape') {
+        closeModal();
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    }
+}
