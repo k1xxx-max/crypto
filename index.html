@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoEXS | Trading Platform</title>
+    <title>CryptoEXS | Professional Trading</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем TradingView для графиков -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
@@ -15,9 +14,12 @@
         <header class="header">
             <div class="header-content">
                 <h1 class="logo">CryptoEXS</h1>
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <span id="usernameDisplay"></span>
-                    <button onclick="logout()" class="logout-btn">Выйти</button>
+                <div class="header-actions">
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <span class="balance-preview">10,000.00 USDT</span>
+                        <span id="usernameDisplay"></span>
+                        <button onclick="logout()" class="logout-btn">Выйти</button>
+                    </div>
                 </div>
             </div>
         </header>
@@ -27,19 +29,22 @@
             <!-- Страница авторизации -->
             <div id="auth-page" class="page active">
                 <div class="auth-container">
+                    <div class="auth-logo">
+                        <h1>CryptoEXS</h1>
+                        <p>Профессиональная торговля криптовалютами</p>
+                    </div>
+                    
                     <div class="auth-tabs">
                         <button class="auth-tab active" data-tab="login">Вход</button>
                         <button class="auth-tab" data-tab="register">Регистрация</button>
                     </div>
 
-                    <!-- Форма входа -->
                     <div id="login-form" class="auth-form active">
                         <input type="text" id="loginUsername" placeholder="Логин" class="auth-input">
                         <input type="password" id="loginPassword" placeholder="Пароль" class="auth-input">
                         <button onclick="login()" class="auth-btn">Войти</button>
                     </div>
 
-                    <!-- Форма регистрации -->
                     <div id="register-form" class="auth-form">
                         <input type="text" id="regUsername" placeholder="Придумайте логин" class="auth-input">
                         <input type="password" id="regPassword" placeholder="Придумайте пароль" class="auth-input">
@@ -49,100 +54,233 @@
                 </div>
             </div>
 
-            <!-- Главная страница (после авторизации) -->
+            <!-- Главная страница -->
             <div id="main-page" class="page">
-                <div class="balance-card">
-                    <h3>Общий баланс</h3>
-                    <div class="balance-amount" id="totalBalance">10,000.00 USDT</div>
-                    <div class="balance-stats">
-                        <div class="stat-item">
-                            <span>Доступно</span>
-                            <span>8,500.00 USDT</span>
-                        </div>
-                        <div class="stat-item">
-                            <span>В ордерах</span>
-                            <span>1,500.00 USDT</span>
+                <div class="dashboard">
+                    <div class="balance-card">
+                        <h3>Общий баланс</h3>
+                        <div class="balance-amount">10,000.00 USDT</div>
+                        <div class="balance-stats">
+                            <div class="stat-item">
+                                <span>Доступно</span>
+                                <span>8,500.00 USDT</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>В ордерах</span>
+                                <span>1,500.00 USDT</span>
+                            </div>
+                            <div class="stat-item">
+                                <span>PNL</span>
+                                <span class="positive">+250.00 USDT</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="quick-actions">
-                    <button class="action-btn" onclick="switchPage('trade')">
-                        <span>📊</span>
-                        Торговать
-                    </button>
-                    <button class="action-btn" onclick="switchPage('assets')">
-                        <span>💰</span>
-                        Активы
-                    </button>
+                    <div class="market-overview">
+                        <h3>Рынок</h3>
+                        <div class="market-tickers">
+                            <!-- Тикеры будут добавлены через JS -->
+                        </div>
+                    </div>
+
+                    <div class="quick-actions">
+                        <button class="action-btn primary" onclick="switchPage('trade')">
+                            <span>📊</span>
+                            Начать торговлю
+                        </button>
+                        <button class="action-btn" onclick="switchPage('assets')">
+                            <span>💰</span>
+                            Мои активы
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Страница торговли -->
+            <!-- Торговый терминал -->
             <div id="trade-page" class="page">
-                <div class="trade-header">
-                    <h2>Фьючерсы</h2>
-                    <select id="timeframe" class="timeframe-select" onchange="updateChartTimeframe()">
-                        <option value="1">1m</option>
-                        <option value="5">5m</option>
-                        <option value="15" selected>15m</option>
-                        <option value="60">1h</option>
-                        <option value="240">4h</option>
-                        <option value="1D">1D</option>
-                    </select>
-                </div>
-
-                <div class="crypto-grid">
-                    <!-- Криптовалюты будут добавлены через JS -->
-                </div>
-
-                <div class="chart-container" id="chartContainer" style="display: none;">
-                    <div class="chart-header">
-                        <div class="chart-title">
-                            <h3 id="selectedCryptoName">Bitcoin</h3>
-                            <span class="crypto-symbol" id="selectedCryptoSymbol">BTCUSDT</span>
+                <div class="trading-terminal">
+                    <!-- Верхняя панель -->
+                    <div class="terminal-header">
+                        <div class="symbol-selector">
+                            <select id="symbolSelect" onchange="changeSymbol()">
+                                <option value="BTCUSDT">BTC/USDT</option>
+                                <option value="ETHUSDT">ETH/USDT</option>
+                                <option value="SOLUSDT">SOL/USDT</option>
+                                <option value="XRPUSDT">XRP/USDT</option>
+                                <option value="ADAUSDT">ADA/USDT</option>
+                                <option value="DOGEUSDT">DOGE/USDT</option>
+                                <option value="AVAXUSDT">AVAX/USDT</option>
+                            </select>
                         </div>
-                        <div class="chart-price-info">
-                            <span class="current-price" id="currentPrice">$0.00</span>
-                            <span class="price-change" id="priceChange">+0.00%</span>
+                        <div class="price-info">
+                            <span class="price">$42,150.30</span>
+                            <span class="change positive">+2.45%</span>
                         </div>
-                        <button onclick="closeChart()" class="close-chart">×</button>
+                        <div class="terminal-actions">
+                            <button class="icon-btn" onclick="toggleFullscreen()">⛶</button>
+                        </div>
                     </div>
-                    
-                    <div class="chart-toolbar">
-                        <button class="toolbar-btn active" data-interval="15">15m</button>
-                        <button class="toolbar-btn" data-interval="60">1h</button>
-                        <button class="toolbar-btn" data-interval="240">4h</button>
-                        <button class="toolbar-btn" data-interval="1D">1D</button>
+
+                    <!-- Основной контент -->
+                    <div class="terminal-content">
+                        <!-- Левая колонка - График -->
+                        <div class="chart-column">
+                            <div class="chart-container">
+                                <div class="chart-toolbar">
+                                    <div class="timeframes">
+                                        <button class="timeframe-btn active">15m</button>
+                                        <button class="timeframe-btn">1h</button>
+                                        <button class="timeframe-btn">4h</button>
+                                        <button class="timeframe-btn">1D</button>
+                                    </div>
+                                    <div class="chart-indicators">
+                                        <button class="indicator-btn">RSI</button>
+                                        <button class="indicator-btn">MACD</button>
+                                        <button class="indicator-btn">VOL</button>
+                                    </div>
+                                </div>
+                                <div id="tradingview-chart" class="tradingview-widget"></div>
+                            </div>
+                        </div>
+
+                        <!-- Правая колонка - Торговля -->
+                        <div class="trade-column">
+                            <!-- Ордер бокс -->
+                            <div class="order-box">
+                                <div class="order-tabs">
+                                    <button class="order-tab active" data-type="limit">Limit</button>
+                                    <button class="order-tab" data-type="market">Market</button>
+                                </div>
+
+                                <div class="order-form">
+                                    <!-- Buy Section -->
+                                    <div class="order-side buy">
+                                        <div class="side-header">
+                                            <span class="side-title">BUY/LONG</span>
+                                            <span class="available">Available: 8,500 USDT</span>
+                                        </div>
+                                        
+                                        <div class="input-group">
+                                            <label>Price (USDT)</label>
+                                            <input type="number" class="order-input" value="42150.30">
+                                        </div>
+                                        
+                                        <div class="input-group">
+                                            <label>Amount</label>
+                                            <input type="number" class="order-input" value="0.1" step="0.01">
+                                        </div>
+
+                                        <div class="leverage-section">
+                                            <label>Leverage: <span id="leverageValue">10x</span></label>
+                                            <input type="range" min="1" max="100" value="10" class="leverage-slider">
+                                        </div>
+
+                                        <div class="order-summary">
+                                            <div class="summary-item">
+                                                <span>Cost</span>
+                                                <span>4,215.03 USDT</span>
+                                            </div>
+                                            <div class="summary-item">
+                                                <span>Margin</span>
+                                                <span>421.50 USDT</span>
+                                            </div>
+                                        </div>
+
+                                        <button class="buy-btn" onclick="placeOrder('buy')">
+                                            Buy/Long
+                                        </button>
+                                    </div>
+
+                                    <!-- Sell Section -->
+                                    <div class="order-side sell">
+                                        <div class="side-header">
+                                            <span class="side-title">SELL/SHORT</span>
+                                            <span class="available">Available: 0.1 BTC</span>
+                                        </div>
+                                        
+                                        <div class="input-group">
+                                            <label>Price (USDT)</label>
+                                            <input type="number" class="order-input" value="42150.30">
+                                        </div>
+                                        
+                                        <div class="input-group">
+                                            <label>Amount</label>
+                                            <input type="number" class="order-input" value="0.1" step="0.01">
+                                        </div>
+
+                                        <div class="leverage-section">
+                                            <label>Leverage: <span>10x</span></label>
+                                            <input type="range" min="1" max="100" value="10" class="leverage-slider">
+                                        </div>
+
+                                        <div class="order-summary">
+                                            <div class="summary-item">
+                                                <span>Cost</span>
+                                                <span>4,215.03 USDT</span>
+                                            </div>
+                                            <div class="summary-item">
+                                                <span>Margin</span>
+                                                <span>421.50 USDT</span>
+                                            </div>
+                                        </div>
+
+                                        <button class="sell-btn" onclick="placeOrder('sell')">
+                                            Sell/Short
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Открытые позиции -->
+                            <div class="positions-widget">
+                                <h4>Open Positions</h4>
+                                <div class="positions-list">
+                                    <div class="position-item long">
+                                        <div class="position-info">
+                                            <span class="symbol">BTCUSDT</span>
+                                            <span class="side long">LONG</span>
+                                        </div>
+                                        <div class="position-details">
+                                            <span>0.05 BTC</span>
+                                            <span class="pnl positive">+125.50 USDT</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div id="tradingview-chart" class="tradingview-chart"></div>
-                    
-                    <div class="chart-footer">
-                        <div class="price-stats">
-                            <div class="stat">
-                                <span>24h Объем:</span>
-                                <span id="volume24h">$1.2B</span>
-                            </div>
-                            <div class="stat">
-                                <span>24h High:</span>
-                                <span class="price-up" id="high24h">$0.00</span>
-                            </div>
-                            <div class="stat">
-                                <span>24h Low:</span>
-                                <span class="price-down" id="low24h">$0.00</span>
-                            </div>
+
+                    <!-- Нижняя панель - Ордера и история -->
+                    <div class="terminal-footer">
+                        <div class="orders-tabs">
+                            <button class="orders-tab active">Open Orders</button>
+                            <button class="orders-tab">Order History</button>
+                            <button class="orders-tab">Trade History</button>
                         </div>
                         
-                        <div class="trade-actions">
-                            <button class="trade-btn long" onclick="openTradeModal(currentCrypto, 'long')">
-                                <span>BUY</span>
-                                <span>LONG</span>
-                            </button>
-                            <button class="trade-btn short" onclick="openTradeModal(currentCrypto, 'short')">
-                                <span>SELL</span>
-                                <span>SHORT</span>
-                            </button>
+                        <div class="orders-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Side</th>
+                                        <th>Price</th>
+                                        <th>Amount</th>
+                                        <th>Total</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>BTCUSDT</td>
+                                        <td class="buy">BUY</td>
+                                        <td>42,100.00</td>
+                                        <td>0.05</td>
+                                        <td>2,105.00</td>
+                                        <td><button class="cancel-btn">Cancel</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -150,26 +288,53 @@
 
             <!-- Страница активов -->
             <div id="assets-page" class="page">
-                <div class="assets-card">
-                    <h2>Ваши активы</h2>
-                    <div class="assets-list">
-                        <div class="asset-item">
-                            <span>USDT</span>
-                            <span>10,000.00</span>
+                <div class="assets-container">
+                    <div class="wallet-card">
+                        <h2>Кошелек</h2>
+                        <div class="wallet-balance">
+                            <span class="total-balance">10,250.50 USDT</span>
+                            <span class="profit positive">+2.50%</span>
                         </div>
-                        <div class="asset-item">
-                            <span>BTC</span>
-                            <span>0.25</span>
+                        
+                        <div class="assets-grid">
+                            <div class="asset-item">
+                                <span>USDT</span>
+                                <span>8,500.00</span>
+                            </div>
+                            <div class="asset-item">
+                                <span>BTC</span>
+                                <span>0.25</span>
+                            </div>
+                            <div class="asset-item">
+                                <span>ETH</span>
+                                <span>2.50</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="deposit-section">
-                    <h3>Пополнение счета</h3>
-                    <p>Для пополнения баланса перейдите в нашего бота</p>
-                    <a href="https://t.me/your_deposit_bot" class="deposit-btn" target="_blank">
-                        📲 Перейти к пополнению
-                    </a>
+                    <div class="deposit-section">
+                        <h3>Пополнение счета</h3>
+                        <p>Для пополнения баланса перейдите в нашего бота</p>
+                        <a href="https://t.me/your_deposit_bot" class="deposit-btn" target="_blank">
+                            📲 Пополнить через Telegram
+                        </a>
+                    </div>
+
+                    <div class="transaction-history">
+                        <h3>История операций</h3>
+                        <div class="transactions-list">
+                            <div class="transaction-item">
+                                <span>Buy BTC</span>
+                                <span class="amount">+0.1 BTC</span>
+                                <span class="date">12.01.2024</span>
+                            </div>
+                            <div class="transaction-item">
+                                <span>Deposit</span>
+                                <span class="amount positive">+1,000 USDT</span>
+                                <span class="date">11.01.2024</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -182,13 +347,48 @@
             </button>
             <button class="nav-btn" data-page="trade">
                 <span>📊</span>
-                Торговать
+                Торговля
             </button>
             <button class="nav-btn" data-page="assets">
                 <span>💰</span>
                 Активы
             </button>
         </nav>
+
+        <!-- Модальное окно ордера -->
+        <div id="orderModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h3 id="modalTitle">Подтверждение ордера</h3>
+                <div class="order-confirm">
+                    <div class="confirm-item">
+                        <span>Symbol:</span>
+                        <span id="confirmSymbol">BTCUSDT</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span>Side:</span>
+                        <span id="confirmSide">BUY/LONG</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span>Price:</span>
+                        <span id="confirmPrice">42,150.30 USDT</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span>Amount:</span>
+                        <span id="confirmAmount">0.1 BTC</span>
+                    </div>
+                    <div class="confirm-item">
+                        <span>Leverage:</span>
+                        <span id="confirmLeverage">10x</span>
+                    </div>
+                    <div class="confirm-item total">
+                        <span>Total:</span>
+                        <span id="confirmTotal">4,215.03 USDT</span>
+                    </div>
+                </div>
+                <button class="confirm-btn" onclick="confirmOrder()">Подтвердить</button>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
