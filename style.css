@@ -2,13 +2,20 @@
     --bg-primary: #0f172a;
     --bg-secondary: #1e293b;
     --bg-tertiary: #334155;
+    --bg-accent: #1e40af;
     --text-primary: #f1f5f9;
     --text-secondary: #94a3b8;
+    --text-accent: #60a5fa;
     --accent-green: #16a34a;
     --accent-red: #dc2626;
     --accent-blue: #2563eb;
     --accent-orange: #f59e0b;
+    --accent-purple: #8b5cf6;
     --border-color: #334155;
+    --border-light: #475569;
+    --success: #22c55e;
+    --warning: #eab308;
+    --danger: #ef4444;
 }
 
 * {
@@ -18,27 +25,28 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-primary);
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 .app {
     max-width: 100%;
     min-height: 100vh;
     margin: 0 auto;
-    padding-bottom: 70px;
 }
 
 /* Шапка */
 .header {
     background: var(--bg-secondary);
-    padding: 15px 20px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -48,245 +56,744 @@ body {
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--accent-orange);
-    background: linear-gradient(45deg, var(--accent-orange), #f97316);
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-orange), var(--accent-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    letter-spacing: -0.5px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
 
 .user-info {
     display: flex;
     align-items: center;
     gap: 15px;
+    font-size: 0.9rem;
+}
+
+.balance-preview {
+    font-weight: 600;
+    color: var(--accent-green);
 }
 
 .logout-btn {
     background: var(--bg-tertiary);
     color: var(--text-primary);
     border: none;
-    padding: 8px 12px;
+    padding: 8px 16px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 0.9rem;
+    transition: background 0.2s;
 }
 
-/* ... (остальные стили остаются такими же) ... */
-
-/* Стили для графика */
-.chart-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--bg-primary);
-    z-index: 1000;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
+.logout-btn:hover {
+    background: var(--accent-red);
 }
 
-.chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    padding: 15px;
+/* Страницы */
+.page {
+    display: none;
+    padding: 0;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Авторизация */
+.auth-container {
+    max-width: 400px;
+    margin: 40px auto;
     background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-logo h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.auth-logo p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.auth-tabs {
+    display: flex;
+    margin-bottom: 25px;
+    background: var(--bg-tertiary);
     border-radius: 12px;
+    padding: 4px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.auth-tab.active {
+    background: var(--accent-blue);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.auth-input {
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.auth-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+/* Главная страница */
+.dashboard {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.balance-card {
+    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.balance-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(45deg) translateX(-100%); }
+    100% { transform: rotate(45deg) translateX(100%); }
+}
+
+.balance-amount {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 15px 0;
+    color: var(--accent-green);
+    text-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+}
+
+.balance-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    background: var(--bg-primary);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+
+.stat-item span:first-child {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.positive { color: var(--accent-green); }
+.negative { color: var(--accent-red); }
+
+.market-overview {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 25px;
     border: 1px solid var(--border-color);
 }
 
-.chart-title {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+.market-tickers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 15px;
 }
 
-.chart-title h3 {
-    font-size: 1.3rem;
+.ticker-item {
+    background: var(--bg-primary);
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s;
+}
+
+.ticker-item:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-blue);
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.action-btn {
+    padding: 25px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
     color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
 }
 
-.crypto-symbol {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+.action-btn:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent-blue);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.2);
 }
 
-.chart-price-info {
+.action-btn.primary {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    border: none;
+}
+
+.action-btn span {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* Торговый терминал */
+.trading-terminal {
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
+    background: var(--bg-primary);
 }
 
-.current-price {
-    font-size: 1.4rem;
-    font-weight: bold;
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.price-change {
-    font-size: 0.9rem;
+.symbol-selector select {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 1.1rem;
     font-weight: 600;
 }
 
-.price-change.positive {
-    color: var(--accent-green);
+.price-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.price-change.negative {
-    color: var(--accent-red);
+.price {
+    font-size: 1.4rem;
+    font-weight: 700;
 }
 
-.close-chart {
+.change {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.terminal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.icon-btn {
     background: var(--bg-tertiary);
-    border: none;
+    border: 1px solid var(--border-color);
     color: var(--text-primary);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.5rem;
+    padding: 8px 12px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-left: 15px;
+    font-size: 1.1rem;
+}
+
+.terminal-content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+.chart-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.chart-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .chart-toolbar {
     display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-    padding: 0 15px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
 }
 
-.toolbar-btn {
-    padding: 8px 16px;
+.timeframes, .chart-indicators {
+    display: flex;
+    gap: 8px;
+}
+
+.timeframe-btn, .indicator-btn {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 8px 16px;
     border-radius: 20px;
-    color: var(--text-secondary);
     cursor: pointer;
     font-size: 0.9rem;
     transition: all 0.2s;
 }
 
-.toolbar-btn.active,
-.toolbar-btn:hover {
+.timeframe-btn.active, .indicator-btn.active {
     background: var(--accent-blue);
-    color: white;
     border-color: var(--accent-blue);
+    color: white;
 }
 
-.tradingview-chart {
-    width: 100%;
-    height: 400px;
-    margin-bottom: 15px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--border-color);
+.tradingview-widget {
+    flex: 1;
+    min-height: 0;
 }
 
-.chart-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.price-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 15px;
+.trade-column {
+    width: 350px;
     background: var(--bg-secondary);
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.stat {
+    border-left: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
-    gap: 4px;
 }
 
-.stat span:first-child {
-    font-size: 0.8rem;
+.order-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.order-tabs {
+    display: flex;
+    background: var(--bg-tertiary);
+    padding: 4px;
+}
+
+.order-tab {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
     color: var(--text-secondary);
-}
-
-.stat span:last-child {
-    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 6px;
     font-weight: 600;
 }
 
-.trade-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
+.order-tab.active {
+    background: var(--accent-blue);
+    color: white;
 }
 
-.trade-btn {
-    padding: 20px;
-    border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: transform 0.2s;
+.order-form {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 4px;
+    padding: 20px;
+    gap: 20px;
+    overflow-y: auto;
 }
 
-.trade-btn.long {
+.order-side {
+    background: var(--bg-primary);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-light);
+}
+
+.side-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.side-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.available {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.order-input {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.leverage-section {
+    margin-bottom: 15px;
+}
+
+.leverage-slider {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.order-summary {
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.summary-item:last-child {
+    margin-bottom: 0;
+}
+
+.buy-btn, .sell-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.buy-btn {
     background: var(--accent-green);
     color: white;
 }
 
-.trade-btn.short {
+.sell-btn {
     background: var(--accent-red);
     color: white;
 }
 
-.trade-btn:hover {
-    transform: scale(1.05);
+.buy-btn:hover, .sell-btn:hover {
+    transform: scale(1.02);
 }
 
-.trade-btn span:first-child {
-    font-size: 1.2rem;
-    font-weight: 800;
+.positions-widget {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
 }
 
-.trade-btn span:last-child {
+.positions-list {
+    margin-top: 15px;
+}
+
+.position-item {
+    background: var(--bg-primary);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--accent-green);
+}
+
+.position-item.short {
+    border-left-color: var(--accent-red);
+}
+
+.position-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.side {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.side.long {
+    background: var(--accent-green);
+    color: white;
+}
+
+.side.short {
+    background: var(--accent-red);
+    color: white;
+}
+
+.terminal-footer {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    height: 200px;
+}
+
+.orders-tabs {
+    display: flex;
+    background: var(--bg-tertiary);
+    padding: 4px;
+}
+
+.orders-tab {
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.orders-tab.active {
+    background: var(--accent-blue);
+    color: white;
+    border-radius: 6px;
+}
+
+.orders-table {
+    height: calc(100% - 48px);
+    overflow-y: auto;
+}
+
+.orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.orders-table th {
+    background: var(--bg-tertiary);
+    font-weight: 600;
     font-size: 0.9rem;
-    opacity: 0.9;
 }
 
-/* Адаптивность для графика */
+.buy { color: var(--accent-green); }
+.sell { color: var(--accent-red); }
+
+.cancel-btn {
+    background: var(--accent-red);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.order-confirm {
+    margin: 20px 0;
+}
+
+.confirm-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.confirm-item.total {
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-bottom: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid var(--border-color);
+}
+
+.confirm-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent-green);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
-    .chart-header {
+    .terminal-content {
         flex-direction: column;
+    }
+    
+    .trade-column {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .chart-toolbar {
+        flex-wrap: wrap;
         gap: 10px;
-        align-items: flex-start;
     }
     
-    .chart-price-info {
-        align-items: flex-start;
+    .balance-amount {
+        font-size: 2rem;
     }
     
-    .price-stats {
+    .quick-actions {
         grid-template-columns: 1fr;
-    }
-    
-    .tradingview-chart {
-        height: 300px;
     }
 }
 
 /* Анимации */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
 .page.active {
@@ -294,10 +801,16 @@ body {
 }
 
 @keyframes slideIn {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
+    from { 
+        transform: translateY(100%); 
+        opacity: 0; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
 }
 
-.chart-container {
+.modal-content {
     animation: slideIn 0.3s ease-out;
 }
