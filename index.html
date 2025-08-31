@@ -16,7 +16,7 @@
                 <h1 class="logo">CryptoEXS</h1>
                 <div class="header-actions">
                     <div class="user-info" id="userInfo" style="display: none;">
-                        <span class="balance-preview">10,000.00 USDT</span>
+                        <span class="balance-preview" id="balancePreview">10,000.00 USDT</span>
                         <span id="usernameDisplay"></span>
                         <button onclick="logout()" class="logout-btn">Выйти</button>
                     </div>
@@ -39,17 +39,21 @@
                         <button class="auth-tab" data-tab="register">Регистрация</button>
                     </div>
 
+                    <!-- Форма входа -->
                     <div id="login-form" class="auth-form active">
                         <input type="text" id="loginUsername" placeholder="Логин" class="auth-input">
                         <input type="password" id="loginPassword" placeholder="Пароль" class="auth-input">
                         <button onclick="login()" class="auth-btn">Войти</button>
+                        <div id="loginError" class="error-message" style="display: none;"></div>
                     </div>
 
+                    <!-- Форма регистрации -->
                     <div id="register-form" class="auth-form">
                         <input type="text" id="regUsername" placeholder="Придумайте логин" class="auth-input">
                         <input type="password" id="regPassword" placeholder="Придумайте пароль" class="auth-input">
                         <input type="password" id="regConfirmPassword" placeholder="Повторите пароль" class="auth-input">
                         <button onclick="register()" class="auth-btn">Зарегистрироваться</button>
+                        <div id="registerError" class="error-message" style="display: none;"></div>
                     </div>
                 </div>
             </div>
@@ -59,26 +63,26 @@
                 <div class="dashboard">
                     <div class="balance-card">
                         <h3>Общий баланс</h3>
-                        <div class="balance-amount">10,000.00 USDT</div>
+                        <div class="balance-amount" id="mainBalance">10,000.00 USDT</div>
                         <div class="balance-stats">
                             <div class="stat-item">
                                 <span>Доступно</span>
-                                <span>8,500.00 USDT</span>
+                                <span id="availableBalance">8,500.00 USDT</span>
                             </div>
                             <div class="stat-item">
                                 <span>В ордерах</span>
-                                <span>1,500.00 USDT</span>
+                                <span id="lockedBalance">1,500.00 USDT</span>
                             </div>
                             <div class="stat-item">
                                 <span>PNL</span>
-                                <span class="positive">+250.00 USDT</span>
+                                <span class="positive" id="totalPnl">+250.00 USDT</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="market-overview">
                         <h3>Рынок</h3>
-                        <div class="market-tickers">
+                        <div class="market-tickers" id="marketTickers">
                             <!-- Тикеры будут добавлены через JS -->
                         </div>
                     </div>
@@ -113,8 +117,8 @@
                             </select>
                         </div>
                         <div class="price-info">
-                            <span class="price">$42,150.30</span>
-                            <span class="change positive">+2.45%</span>
+                            <span class="price" id="currentPrice">$42,150.30</span>
+                            <span class="change positive" id="priceChange">+2.45%</span>
                         </div>
                         <div class="terminal-actions">
                             <button class="icon-btn" onclick="toggleFullscreen()">⛶</button>
@@ -128,15 +132,15 @@
                             <div class="chart-container">
                                 <div class="chart-toolbar">
                                     <div class="timeframes">
-                                        <button class="timeframe-btn active">15m</button>
-                                        <button class="timeframe-btn">1h</button>
-                                        <button class="timeframe-btn">4h</button>
-                                        <button class="timeframe-btn">1D</button>
+                                        <button class="timeframe-btn active" data-interval="15">15m</button>
+                                        <button class="timeframe-btn" data-interval="60">1h</button>
+                                        <button class="timeframe-btn" data-interval="240">4h</button>
+                                        <button class="timeframe-btn" data-interval="1D">1D</button>
                                     </div>
                                     <div class="chart-indicators">
-                                        <button class="indicator-btn">RSI</button>
-                                        <button class="indicator-btn">MACD</button>
-                                        <button class="indicator-btn">VOL</button>
+                                        <button class="indicator-btn" data-indicator="RSI">RSI</button>
+                                        <button class="indicator-btn" data-indicator="MACD">MACD</button>
+                                        <button class="indicator-btn" data-indicator="VOL">VOL</button>
                                     </div>
                                 </div>
                                 <div id="tradingview-chart" class="tradingview-widget"></div>
@@ -157,32 +161,32 @@
                                     <div class="order-side buy">
                                         <div class="side-header">
                                             <span class="side-title">BUY/LONG</span>
-                                            <span class="available">Available: 8,500 USDT</span>
+                                            <span class="available">Available: <span id="buyAvailable">8,500 USDT</span></span>
                                         </div>
                                         
                                         <div class="input-group">
                                             <label>Price (USDT)</label>
-                                            <input type="number" class="order-input" value="42150.30">
+                                            <input type="number" class="order-input" id="buyPrice" value="42150.30" oninput="updateOrderSummary('buy')">
                                         </div>
                                         
                                         <div class="input-group">
                                             <label>Amount</label>
-                                            <input type="number" class="order-input" value="0.1" step="0.01">
+                                            <input type="number" class="order-input" id="buyAmount" value="0.1" step="0.01" oninput="updateOrderSummary('buy')">
                                         </div>
 
                                         <div class="leverage-section">
-                                            <label>Leverage: <span id="leverageValue">10x</span></label>
-                                            <input type="range" min="1" max="100" value="10" class="leverage-slider">
+                                            <label>Leverage: <span id="buyLeverageValue">10x</span></label>
+                                            <input type="range" min="1" max="100" value="10" class="leverage-slider" id="buyLeverage" oninput="updateLeverage('buy', this.value)">
                                         </div>
 
                                         <div class="order-summary">
                                             <div class="summary-item">
                                                 <span>Cost</span>
-                                                <span>4,215.03 USDT</span>
+                                                <span id="buyCost">4,215.03 USDT</span>
                                             </div>
                                             <div class="summary-item">
                                                 <span>Margin</span>
-                                                <span>421.50 USDT</span>
+                                                <span id="buyMargin">421.50 USDT</span>
                                             </div>
                                         </div>
 
@@ -195,32 +199,32 @@
                                     <div class="order-side sell">
                                         <div class="side-header">
                                             <span class="side-title">SELL/SHORT</span>
-                                            <span class="available">Available: 0.1 BTC</span>
+                                            <span class="available">Available: <span id="sellAvailable">0.1 BTC</span></span>
                                         </div>
                                         
                                         <div class="input-group">
                                             <label>Price (USDT)</label>
-                                            <input type="number" class="order-input" value="42150.30">
+                                            <input type="number" class="order-input" id="sellPrice" value="42150.30" oninput="updateOrderSummary('sell')">
                                         </div>
                                         
                                         <div class="input-group">
                                             <label>Amount</label>
-                                            <input type="number" class="order-input" value="0.1" step="0.01">
+                                            <input type="number" class="order-input" id="sellAmount" value="0.1" step="0.01" oninput="updateOrderSummary('sell')">
                                         </div>
 
                                         <div class="leverage-section">
-                                            <label>Leverage: <span>10x</span></label>
-                                            <input type="range" min="1" max="100" value="10" class="leverage-slider">
+                                            <label>Leverage: <span id="sellLeverageValue">10x</span></label>
+                                            <input type="range" min="1" max="100" value="10" class="leverage-slider" id="sellLeverage" oninput="updateLeverage('sell', this.value)">
                                         </div>
 
                                         <div class="order-summary">
                                             <div class="summary-item">
                                                 <span>Cost</span>
-                                                <span>4,215.03 USDT</span>
+                                                <span id="sellCost">4,215.03 USDT</span>
                                             </div>
                                             <div class="summary-item">
                                                 <span>Margin</span>
-                                                <span>421.50 USDT</span>
+                                                <span id="sellMargin">421.50 USDT</span>
                                             </div>
                                         </div>
 
@@ -234,7 +238,7 @@
                             <!-- Открытые позиции -->
                             <div class="positions-widget">
                                 <h4>Open Positions</h4>
-                                <div class="positions-list">
+                                <div class="positions-list" id="positionsList">
                                     <div class="position-item long">
                                         <div class="position-info">
                                             <span class="symbol">BTCUSDT</span>
@@ -253,34 +257,36 @@
                     <!-- Нижняя панель - Ордера и история -->
                     <div class="terminal-footer">
                         <div class="orders-tabs">
-                            <button class="orders-tab active">Open Orders</button>
-                            <button class="orders-tab">Order History</button>
-                            <button class="orders-tab">Trade History</button>
+                            <button class="orders-tab active" data-tab="orders">Open Orders</button>
+                            <button class="orders-tab" data-tab="history">Order History</button>
+                            <button class="orders-tab" data-tab="trades">Trade History</button>
                         </div>
                         
                         <div class="orders-table">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Side</th>
-                                        <th>Price</th>
-                                        <th>Amount</th>
-                                        <th>Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>BTCUSDT</td>
-                                        <td class="buy">BUY</td>
-                                        <td>42,100.00</td>
-                                        <td>0.05</td>
-                                        <td>2,105.00</td>
-                                        <td><button class="cancel-btn">Cancel</button></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="table-container" id="ordersTable">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Side</th>
+                                            <th>Price</th>
+                                            <th>Amount</th>
+                                            <th>Total</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>BTCUSDT</td>
+                                            <td class="buy">BUY</td>
+                                            <td>42,100.00</td>
+                                            <td>0.05</td>
+                                            <td>2,105.00</td>
+                                            <td><button class="cancel-btn">Cancel</button></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -292,11 +298,11 @@
                     <div class="wallet-card">
                         <h2>Кошелек</h2>
                         <div class="wallet-balance">
-                            <span class="total-balance">10,250.50 USDT</span>
-                            <span class="profit positive">+2.50%</span>
+                            <span class="total-balance" id="walletBalance">10,250.50 USDT</span>
+                            <span class="profit positive" id="walletProfit">+2.50%</span>
                         </div>
                         
-                        <div class="assets-grid">
+                        <div class="assets-grid" id="assetsGrid">
                             <div class="asset-item">
                                 <span>USDT</span>
                                 <span>8,500.00</span>
@@ -322,7 +328,7 @@
 
                     <div class="transaction-history">
                         <h3>История операций</h3>
-                        <div class="transactions-list">
+                        <div class="transactions-list" id="transactionsList">
                             <div class="transaction-item">
                                 <span>Buy BTC</span>
                                 <span class="amount">+0.1 BTC</span>
