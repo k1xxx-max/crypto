@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CryptoFutures | Bybit Style</title>
+    <title>CryptoEXS | Trading Platform</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <!-- Подключаем TradingView для графиков -->
@@ -14,7 +14,7 @@
         <!-- Шапка -->
         <header class="header">
             <div class="header-content">
-                <h1 class="logo">CryptoFutures</h1>
+                <h1 class="logo">CryptoEXS</h1>
                 <div class="user-info" id="userInfo" style="display: none;">
                     <span id="usernameDisplay"></span>
                     <button onclick="logout()" class="logout-btn">Выйти</button>
@@ -82,12 +82,13 @@
             <div id="trade-page" class="page">
                 <div class="trade-header">
                     <h2>Фьючерсы</h2>
-                    <select id="timeframe" class="timeframe-select">
+                    <select id="timeframe" class="timeframe-select" onchange="updateChartTimeframe()">
                         <option value="1">1m</option>
                         <option value="5">5m</option>
-                        <option value="15">15m</option>
+                        <option value="15" selected>15m</option>
                         <option value="60">1h</option>
                         <option value="240">4h</option>
+                        <option value="1D">1D</option>
                     </select>
                 </div>
 
@@ -97,13 +98,52 @@
 
                 <div class="chart-container" id="chartContainer" style="display: none;">
                     <div class="chart-header">
-                        <h3 id="selectedCryptoName">Bitcoin</h3>
+                        <div class="chart-title">
+                            <h3 id="selectedCryptoName">Bitcoin</h3>
+                            <span class="crypto-symbol" id="selectedCryptoSymbol">BTCUSDT</span>
+                        </div>
+                        <div class="chart-price-info">
+                            <span class="current-price" id="currentPrice">$0.00</span>
+                            <span class="price-change" id="priceChange">+0.00%</span>
+                        </div>
                         <button onclick="closeChart()" class="close-chart">×</button>
                     </div>
+                    
+                    <div class="chart-toolbar">
+                        <button class="toolbar-btn active" data-interval="15">15m</button>
+                        <button class="toolbar-btn" data-interval="60">1h</button>
+                        <button class="toolbar-btn" data-interval="240">4h</button>
+                        <button class="toolbar-btn" data-interval="1D">1D</button>
+                    </div>
+                    
                     <div id="tradingview-chart" class="tradingview-chart"></div>
-                    <div class="trade-actions">
-                        <button class="trade-btn long" onclick="openTradeModal(currentCrypto, 'long')">LONG</button>
-                        <button class="trade-btn short" onclick="openTradeModal(currentCrypto, 'short')">SHORT</button>
+                    
+                    <div class="chart-footer">
+                        <div class="price-stats">
+                            <div class="stat">
+                                <span>24h Объем:</span>
+                                <span id="volume24h">$1.2B</span>
+                            </div>
+                            <div class="stat">
+                                <span>24h High:</span>
+                                <span class="price-up" id="high24h">$0.00</span>
+                            </div>
+                            <div class="stat">
+                                <span>24h Low:</span>
+                                <span class="price-down" id="low24h">$0.00</span>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-actions">
+                            <button class="trade-btn long" onclick="openTradeModal(currentCrypto, 'long')">
+                                <span>BUY</span>
+                                <span>LONG</span>
+                            </button>
+                            <button class="trade-btn short" onclick="openTradeModal(currentCrypto, 'short')">
+                                <span>SELL</span>
+                                <span>SHORT</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
