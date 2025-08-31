@@ -7,6 +7,7 @@
     --accent-green: #16a34a;
     --accent-red: #dc2626;
     --accent-blue: #2563eb;
+    --accent-orange: #f59e0b;
     --border-color: #334155;
 }
 
@@ -35,6 +36,9 @@ body {
     background: var(--bg-secondary);
     padding: 15px 20px;
     border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header-content {
@@ -46,7 +50,10 @@ body {
 .logo {
     font-size: 1.5rem;
     font-weight: bold;
-    color: var(--accent-blue);
+    color: var(--accent-orange);
+    background: linear-gradient(45deg, var(--accent-orange), #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .user-info {
@@ -65,208 +72,9 @@ body {
     font-size: 0.9rem;
 }
 
-/* Страницы */
-.page {
-    display: none;
-    padding: 20px;
-}
+/* ... (остальные стили остаются такими же) ... */
 
-.page.active {
-    display: block;
-}
-
-/* Авторизация */
-.auth-container {
-    max-width: 400px;
-    margin: 50px auto;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid var(--border-color);
-}
-
-.auth-tabs {
-    display: flex;
-    margin-bottom: 20px;
-    background: var(--bg-tertiary);
-    border-radius: 8px;
-    padding: 4px;
-}
-
-.auth-tab {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-radius: 6px;
-    font-weight: 500;
-}
-
-.auth-tab.active {
-    background: var(--accent-blue);
-    color: white;
-}
-
-.auth-form {
-    display: none;
-}
-
-.auth-form.active {
-    display: block;
-}
-
-.auth-input {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 1rem;
-}
-
-.auth-btn {
-    width: 100%;
-    padding: 15px;
-    background: var(--accent-blue);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.auth-btn:hover {
-    background: #1d4ed8;
-}
-
-/* Главная страница */
-.balance-card {
-    background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 1px solid var(--border-color);
-}
-
-.balance-amount {
-    font-size: 2.5rem;
-    font-weight: bold;
-    margin: 15px 0;
-    color: var(--accent-green);
-}
-
-.balance-stats {
-    display: flex;
-    gap: 20px;
-}
-
-.stat-item {
-    flex: 1;
-    text-align: center;
-    padding: 15px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-}
-
-.stat-item span:first-child {
-    display: block;
-    color: var(--text-secondary);
-    margin-bottom: 5px;
-}
-
-.quick-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.action-btn {
-    padding: 20px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.action-btn:hover {
-    transform: translateY(-2px);
-    background: var(--bg-tertiary);
-}
-
-.action-btn span {
-    font-size: 1.5rem;
-    display: block;
-    margin-bottom: 8px;
-}
-
-/* Торговля */
-.trade-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.timeframe-select {
-    background: var(--bg-tertiary);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 8px 12px;
-}
-
-.crypto-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-}
-
-.crypto-item {
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.crypto-item:hover {
-    background: var(--bg-tertiary);
-    transform: translateX(4px);
-}
-
-.crypto-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.crypto-name {
-    font-weight: 600;
-    font-size: 1.1rem;
-}
-
-.crypto-price {
-    font-weight: bold;
-}
-
-.price-up {
-    color: var(--accent-green);
-}
-
-.price-down {
-    color: var(--accent-red);
-}
-
+/* Стили для графика */
 .chart-container {
     position: fixed;
     top: 0;
@@ -276,6 +84,8 @@ body {
     background: var(--bg-primary);
     z-index: 1000;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 
 .chart-header {
@@ -283,6 +93,51 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.chart-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chart-title h3 {
+    font-size: 1.3rem;
+    color: var(--text-primary);
+}
+
+.crypto-symbol {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.chart-price-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.current-price {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.price-change {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.price-change.positive {
+    color: var(--accent-green);
+}
+
+.price-change.negative {
+    color: var(--accent-red);
 }
 
 .close-chart {
@@ -294,12 +149,73 @@ body {
     border-radius: 50%;
     font-size: 1.5rem;
     cursor: pointer;
+    margin-left: 15px;
+}
+
+.chart-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    padding: 0 15px;
+}
+
+.toolbar-btn {
+    padding: 8px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.toolbar-btn.active,
+.toolbar-btn:hover {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
 }
 
 .tradingview-chart {
     width: 100%;
     height: 400px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.chart-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.price-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 15px;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat span:first-child {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.stat span:last-child {
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .trade-actions {
@@ -312,10 +228,14 @@ body {
     padding: 20px;
     border: none;
     border-radius: 12px;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
     transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 
 .trade-btn.long {
@@ -332,84 +252,35 @@ body {
     transform: scale(1.05);
 }
 
-/* Активы */
-.assets-card {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    border: 1px solid var(--border-color);
-}
-
-.assets-list {
-    margin-top: 20px;
-}
-
-.asset-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px;
-    background: var(--bg-primary);
-    border-radius: 8px;
-    margin-bottom: 10px;
-    border: 1px solid var(--border-color);
-}
-
-.deposit-section {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 25px;
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.deposit-btn {
-    display: inline-block;
-    margin-top: 15px;
-    padding: 15px 30px;
-    background: var(--accent-blue);
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background 0.2s;
-}
-
-.deposit-btn:hover {
-    background: #1d4ed8;
-}
-
-/* Нижняя навигация */
-.bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-secondary);
-    border-top: 1px solid var(--border-color);
-    display: flex;
-    padding: 10px 0;
-}
-
-.nav-btn {
-    flex: 1;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    padding: 12px;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.nav-btn.active {
-    color: var(--accent-blue);
-}
-
-.nav-btn span {
-    display: block;
+.trade-btn span:first-child {
     font-size: 1.2rem;
-    margin-bottom: 4px;
+    font-weight: 800;
+}
+
+.trade-btn span:last-child {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Адаптивность для графика */
+@media (max-width: 768px) {
+    .chart-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .chart-price-info {
+        align-items: flex-start;
+    }
+    
+    .price-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .tradingview-chart {
+        height: 300px;
+    }
 }
 
 /* Анимации */
@@ -420,4 +291,13 @@ body {
 
 .page.active {
     animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.chart-container {
+    animation: slideIn 0.3s ease-out;
 }
